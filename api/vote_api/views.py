@@ -33,3 +33,14 @@ def vote(request)->HttpResponse:
         q.vote(option)
 
         return HttpResponse("vote counted")
+
+@csrf_exempt
+def get_winning_option(request,vote_id)->HttpResponse:
+    try:
+        q = Quiz.objects.get(id=quiz_id)
+    except:
+        resp = HttpResponse(f"quiz {quiz_id} not found")
+        resp.status_code = 404
+        return resp
+
+    return HttpResponse({ "winner" : q.get_winner(self) })

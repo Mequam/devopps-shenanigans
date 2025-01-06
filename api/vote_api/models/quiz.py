@@ -23,6 +23,10 @@ class Quiz(models.Model):
         option.amount += 1
         option.save()
     
+    def get_winner(self)->str:
+        """returns the winning option as a string"""
+        return max([vote for vote in self.get_votes()],key=lambda v : v[1])[0]
+
     def to_json(self)->dict:
         """
         converts this quiz to a dictionary ready to beam over the interwebs :D
@@ -30,7 +34,8 @@ class Quiz(models.Model):
         return json.dumps({
                             "name": self.name,
                             "description": self.description,
-                            "options": [vote[0] for vote in self.get_votes()]
+                            "options": [vote[0] for vote in self.get_votes()],
+                            "winner": self.get_winner()
                     })
 
 
