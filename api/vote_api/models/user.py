@@ -1,6 +1,6 @@
 from django.db import models
 
-class user(models.Model):
+class User(models.Model):
     """
     very simple user class for use with voting, not designed
     for secure login, but just as a skeleton
