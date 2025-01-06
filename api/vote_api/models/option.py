@@ -6,3 +6,4 @@ class Option(models.Model):
     """
     description = models.CharField(max_length=100,null=False)
     quiz = models.ForeignKey('Quiz',null=False,on_delete=models.CASCADE)
+    amount = models.IntegerField(default=0,null=False)

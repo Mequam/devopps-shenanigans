@@ -16,7 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from vote_api.views import get_quiz,vote
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('quiz/<quiz_id>',get_quiz),
+    path('vote',vote)
+
 ]
