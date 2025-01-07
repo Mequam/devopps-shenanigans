@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+from os import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +26,7 @@ SECRET_KEY = 'django-insecure-@gz9!5th^u-faopcs3+d2yy6d$k(44#^7mi3-7tc=t1tqc2-hb
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [environ['ALLOWED_HOST']]
 
 
 # Application definition
@@ -77,11 +78,11 @@ WSGI_APPLICATION = 'voteApi.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'vote',
-        'USER':'jango',
-        'PASSWORD':'jango',
-        'HOST':'localhost',
-        'PORT':'',
+        'NAME': environ['VOTE_NAME'],
+        'USER': environ['VOTE_USER'],
+        'PASSWORD': environ['VOTE_PASSWORD'],
+        'HOST': environ['VOTE_HOST'],
+        'PORT':environ['VOTE_PORT'],
     }
 }
 
