@@ -1,0 +1,21 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Clone Repo') {
+            steps {
+               checkout scm
+            }
+        }
+        stage('Build') {
+            steps {
+                app = docker.build("api/")
+            }
+        }
+        stage('Push Image') {
+            docker.withRegistry('https://registry.hub.docker.com','docker-hub-credentials') {
+               app.push("mequam/django-vote")
+            }
+        }
+    }
+}
