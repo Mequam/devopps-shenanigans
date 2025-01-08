@@ -1,6 +1,8 @@
 pipeline {
     agent any
-
+    environment {
+       DOCKER_CREDS = credentials('docker hub access')
+    }
     stages {
         stage('Clone Repo') {
             steps {
@@ -9,13 +11,15 @@ pipeline {
         }
         stage('Build') {
             steps {
-                app = docker.build("api/")
+                sh 'cd api'
+                sh 'docker build -t mequam/django-vote-v1'
             }
         }
         stage('Push Image') {
-            docker.withRegistry('https://registry.hub.docker.com','docker-hub-credentials') {
-               app.push("mequam/django-vote")
-            }
+           steps {
+               sh 'docker login --username=$DOCKER_CREDS_USR --password=$DOCKER_CREDS_PSW'
+               sh 'docker push mequam/django-vote-v1'
+           }
         }
     }
 }
