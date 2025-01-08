@@ -13,6 +13,7 @@ pipeline {
         stage('Build') {
             steps {
                 sh 'cd api'
+                sh 'ls'
                 script {
                    dockerImage = docker.build(DOCKER_OUT)
                 }
