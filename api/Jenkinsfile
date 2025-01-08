@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-       DOCKER_CREDS = credentials('docker hub access')
+       DOCKER_CREDS = credentials('docker-hub-access')
     }
     stages {
         stage('Clone Repo') {
