@@ -1,9 +1,5 @@
 pipeline {
-    agent {
-       node {
-         label 'docker'
-      }
-    }
+    agent node
     environment {
        DOCKER_OUT = 'mequam/django-vote-v1'
        DOCKER_CREDS_ID = 'docker'
