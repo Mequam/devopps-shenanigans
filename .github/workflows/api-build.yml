@@ -9,7 +9,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Set Working Directory
-      run: cd ./api
     - name: Build the Docker image
+      working-directory: ./api
       run: docker build . --file Dockerfile --tag mequam/django-vote-pipeline
