@@ -29,6 +29,8 @@ DEBUG = True
 ALLOWED_HOSTS = [environ['ALLOWED_HOST']]
 
 
+
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -38,20 +40,29 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'vote_api'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware'
+
 ]
 
 ROOT_URLCONF = 'voteApi.urls'
+
+#TODO: need to make this target a specific origin
+#although, having the quiz data useable by the internet
+#at large is not a bad idea, more of a service functionality
+#than a single site functionality
+CORS_ALLOW_ALL_ORIGINS = True
 
 TEMPLATES = [
     {
