@@ -77,7 +77,7 @@ WSGI_APPLICATION = 'voteApi.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': environ['VOTE_NAME'],
         'USER': environ['VOTE_USER'],
         'PASSWORD': environ['VOTE_PASSWORD'],
