@@ -9,4 +9,5 @@ on:
 jobs:
   build-api:
     uses: ./.github/workflows/api-build.yml
+    secrets: inherit
     
