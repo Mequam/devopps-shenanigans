@@ -7,7 +7,9 @@ import {environment} from "../../environments/environment.development";
 @Injectable({ providedIn: 'root'})
 export class QuizService {
 
-  private readonly GET_URL : string = "/quiz";
+  private readonly GET_URL : string = "quiz";
+  private readonly POST_URL : string = "vote";
+
   constructor(
     protected http: HttpClient
   ) {
@@ -17,5 +19,15 @@ export class QuizService {
     return this.http.get<Quiz>(
       `http://${environment.api_addr}/${this.GET_URL}/${quiz_id}`
     );
+  }
+
+  vote_quiz(quiz_id : number, option : string) {
+    return this.http.post(
+          `http://${environment.api_addr}/${this.POST_URL}`,
+          {
+            quiz_id: String(quiz_id),
+            option:option
+          }
+    )
   }
 }
