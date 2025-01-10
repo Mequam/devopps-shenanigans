@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse,Http404
 from django.views.decorators.csrf import csrf_exempt
 from .models import Quiz
+import json
 
 # Create your views here.
 def get_quiz(request,quiz_id)->HttpResponse:
@@ -17,9 +18,19 @@ def get_quiz(request,quiz_id)->HttpResponse:
 @csrf_exempt
 def vote(request)->HttpResponse:
     if request.method == "POST":
-        data = request.POST
-        quiz_id = data.get("quiz_id")
-        option = data.get("option")
+
+        quiz_id = None
+        option = None
+
+
+        if request.META.get("CONTENT_TYPE") == 'application/json':
+            data = json.loads(request.body)
+            quiz_id = data["quiz_id"]
+            option = data["option"]
+        else:
+            quiz_id = data.get("quiz_id")
+            option = data.get("option")
+
 
         print(quiz_id)
         q = None
