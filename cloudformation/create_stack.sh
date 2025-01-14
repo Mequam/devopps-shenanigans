@@ -7,6 +7,10 @@ aws cloudformation create-stack \
                  ParameterKey=PrivateSubnetCidr,ParameterValue=192.168.2.0/24 \
                  ParameterKey=PrivateDBSubnetCidr,ParameterValue=192.168.3.0/24 \
                  ParameterKey=AvailabilityZone1,ParameterValue=us-east-1a \
-                 ParameterKey=AvailabilityZone2,ParameterValue=us-east-1b
+                 ParameterKey=AvailabilityZone2,ParameterValue=us-east-1b \
+                 ParameterKey=DBUsername,ParameterValue=vote \
+                 ParameterKey=DBPassword,ParameterValue=votevote23blah \
+                 ParameterKey=DBPort,ParameterValue=5433
+
 
 

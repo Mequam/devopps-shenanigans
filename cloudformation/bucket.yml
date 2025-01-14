@@ -1,6 +1,20 @@
 AWSTemplateFormatVersion: 2010-09-09
 
 Parameters:
+  DBUsername:
+    Description: Primary user of the database
+    Type: String
+    AllowedPattern: '[a-z]+'
+  
+  DBPassword:
+    Description: Password to access the database
+    Type: String
+  
+  DBPort:
+    Description: Database Port Number
+    Type: String
+    AllowedPattern: "[0-9]*"
+
   VPCCidr:
     Description: vpc Cider ip range
     Type: String
@@ -77,6 +91,7 @@ Resources:
                 - !Ref AngularVoteApp
                 - /*
       Bucket: !Ref AngularVoteApp
+
   VPC:
     Type: AWS::EC2::VPC
     Properties:
@@ -111,7 +126,7 @@ Resources:
         - Key: "BatchID"
           Value: "DevOps"
 
-  PrivateSubNet:
+  PrivateSubNet1:
     Type: AWS::EC2::Subnet
     Properties:
       AvailabilityZone: !Ref AvailabilityZone1
@@ -122,7 +137,7 @@ Resources:
           Value: "DevOps"
 
 
-  PrivateDBSubnet:
+  PrivateSubNet2:
     Type: AWS::EC2::Subnet
     Properties:
       AvailabilityZone: !Ref AvailabilityZone2
@@ -131,32 +146,60 @@ Resources:
       Tags:
         - Key: "BatchID"
           Value: "DevOps"
+  DBSubnetGroup: 
+    Type: AWS::RDS::DBSubnetGroup
+    Properties: 
+      DBSubnetGroupDescription: subnet group for postgres db
+      SubnetIds: 
+        - !Ref PrivateSubNet2
+        - !Ref PrivateSubNet1
+      Tags: 
+        - Key: "BatchID"
+          Value: "DevOps"
 
-    #  AuroraDBCluster:
-    #    Type: 'AWS::RDS::DBCluster'
-    #    Properties: 
-    #      BackupRetentionPeriod: !Ref BackupRetentionPeriod
-    #      DBClusterIdentifier: !Sub '${DatabaseName}-${AuroraEngine}-cluster'
-    #      DatabaseName: !Ref DatabaseName
-    #      DBSubnetGroupName: !Ref DBSubnetGroup
-    #      DBClusterParameterGroupName: !Ref ClusterParameterGroup
-    #      DeletionProtection: true
-    #      EnableCloudwatchLogsExports: 
-    #        - 'error'
-    #        - 'audit'
-    #      EnableIAMDatabaseAuthentication: !Ref EnableIAMDatabaseAuthentication
-    #      Engine: !Ref AuroraEngine
-    #      EngineMode: 'provisioned'
-    #      EngineVersion: !Ref EngineVersion
-    #      KmsKeyId: !Ref DatabaseKMSKey
-    #      MasterUsername: !Join ['', ['{{resolve:secretsmanager:', !Ref MasterUser, '}}' ]]
-    #      MasterUserPassword: !Join ['', ['{{resolve:secretsmanager:', !Ref MasterPassword, '}}' ]]
-    #      Port: !Ref DBPort
-    #      PreferredBackupWindow: !Ref BackupWindow
-    #      PreferredMaintenanceWindow: !Ref MaintenanceWindow
-    #      StorageEncrypted: true
-    #      VpcSecurityGroupIds: 
-    #      - !Ref SecurityGroupDatabase
+  #let any host from the given subnet talk to us
+  SecurityGroupDatabase:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: 'vote-app-aurora-database-sg'
+      GroupName: 'vote-app-aurora-database-sg'
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          CidrIp: !Ref PublicSubnetCidr
+          FromPort: !Ref DBPort
+          ToPort: !Ref DBPort
+      SecurityGroupEgress:
+        - IpProtocol: '-1'
+          CidrIp: '0.0.0.0/0'
+
+  AuroraDBCluster:
+    Type: 'AWS::RDS::DBCluster'
+    Properties:
+      DBClusterIdentifier: 'vote-app-postgres-db'
+      DatabaseName: 'vote'
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      #DBClusterParameterGroupName: !Ref AuroraPostgresParameterGroup
+      DeletionProtection: false
+      Engine: 'aurora-postgresql'
+      EngineMode: 'provisioned'
+      EngineVersion: "16.6"
+      MasterUsername: !Ref DBUsername
+      MasterUserPassword: !Ref DBPassword
+      Port: !Ref DBPort
+      StorageEncrypted: false
+      VpcSecurityGroupIds:
+        - !Ref SecurityGroupDatabase
+
+  WriterInstance:
+    Type: 'AWS::RDS::DBInstance'
+    Properties:
+      Engine: 'aurora-postgresql'
+      DBClusterIdentifier: !Ref AuroraDBCluster
+      DBInstanceClass: 'db.r5.large'
+      AllowMajorVersionUpgrade: false
+      EnablePerformanceInsights: false
+      PubliclyAccessible: false
 
 
 
