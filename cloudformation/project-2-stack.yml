@@ -34,6 +34,16 @@ Parameters:
     ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
 
 
+  PublicSubnetCidr2:
+    Description: Public Subnet ipv4 address range
+    Type: String
+    MinLength: '9'
+    MaxLength: '18'
+    Default: 0.0.0.0/0
+    AllowedPattern: '^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$'
+    ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
+
+
   PrivateDBSubnetCidr:
     Description: Private Subnet ipv4 for db cluster
     Type: String
@@ -125,6 +135,18 @@ Resources:
       Tags:
         - Key: "BatchID"
           Value: "DevOps"
+  
+  PublicSubNet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Ref AvailabilityZone1
+      MapPublicIpOnLaunch: true
+      CidrBlock: !Ref PublicSubnetCidr2
+      VpcId: !Ref VPC
+      Tags:
+        - Key: "BatchID"
+          Value: "DevOps"
+
 
   PrivateSubNet1:
     Type: AWS::EC2::Subnet
