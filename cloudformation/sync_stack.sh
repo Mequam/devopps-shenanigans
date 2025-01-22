@@ -1,0 +1,67 @@
+#!/bin/bash
+
+STACK_NAME="dak-prok1-stack"
+
+#creates the stack in aws
+create_stack() {
+aws cloudformation create-stack \
+    --stack-name $STACK_NAME \
+    --template-body file://$(pwd)/project-2-stack.yml \
+    --parameters ParameterKey=VPCCidr,ParameterValue=192.168.0.0/16 \
+                 ParameterKey=PublicSubnetCidr,ParameterValue=192.168.1.0/24 \
+                 ParameterKey=PublicSubnetCidr2,ParameterValue=192.168.4.0/24 \
+                 ParameterKey=PrivateSubnetCidr,ParameterValue=192.168.2.0/24 \
+                 ParameterKey=PrivateDBSubnetCidr,ParameterValue=192.168.3.0/24 \
+                 ParameterKey=AvailabilityZone1,ParameterValue=us-east-1a \
+                 ParameterKey=AvailabilityZone2,ParameterValue=us-east-1b \
+                 ParameterKey=InstanceType,ParameterValue=t3.micro \
+                 ParameterKey=DBUsername,ParameterValue=vote \
+                 ParameterKey=DBPassword,ParameterValue=votevote23blah \
+                 ParameterKey=DBPort,ParameterValue=5433
+}
+
+delete_stack() {
+   aws cloudformation delete-stack --stack-name $STACK_NAME
+}
+
+#queries aws to get the status of the stack
+check_status() {
+   STATUS=$(aws cloudformation list-stacks | jq .StackSummaries\[0\].StackStatus | tr -d \")
+}
+
+#waits while the status matches the given argument
+wait_status() {
+
+   check_status
+   while echo $STATUS | grep $1 >/dev/null; do
+      echo "[*] $STATUS contains $1"
+      sleep 3
+      check_status
+   done
+
+   echo "[*] stack has moved past $1"
+   echo "[*] current state $STATUS"
+}
+
+#ensure the stack is deleted so we can re-create it
+echo $STATUS | grep DELETE > /dev/null || delete_stack
+sleep 1
+wait_status DELETE_IN_PROGRESS
+
+
+#create the stack
+create_stack
+
+#wait while we are creating the stack
+wait_status CREATE
+
+#check the status on the end of create
+if echo $STATUS | grep ROLLBACK > /dev/null
+then
+   echo "[*] stack is in rollback state $STATUS"
+elif echo $STATUS | grep COMPLETE > /dev/null
+then
+   echo "[*] stack is completed!"
+fi
+
+echo "[*] exiting with stack status of $STATUS"

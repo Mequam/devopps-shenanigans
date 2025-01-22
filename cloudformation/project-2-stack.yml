@@ -1,6 +1,15 @@
 AWSTemplateFormatVersion: 2010-09-09
 
 Parameters:
+  InstanceType:
+    Description: web server EC2 Instance Type
+    Type: String
+    Default: t3.micro
+    AllowedValues:
+      - t3.micro
+      - t3.small
+      - t3.medium
+
   DBUsername:
     Description: Primary user of the database
     Type: String
@@ -136,10 +145,10 @@ Resources:
         - Key: "BatchID"
           Value: "DevOps"
   
-  PublicSubNet:
+  PublicSubNet2:
     Type: AWS::EC2::Subnet
     Properties:
-      AvailabilityZone: !Ref AvailabilityZone1
+      AvailabilityZone: !Ref AvailabilityZone2
       MapPublicIpOnLaunch: true
       CidrBlock: !Ref PublicSubnetCidr2
       VpcId: !Ref VPC
@@ -178,6 +187,16 @@ Resources:
       Tags: 
         - Key: "BatchID"
           Value: "DevOps"
+  
+  WebServerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security Group For Web Servers
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
 
   #let any host from the given subnet talk to us
   SecurityGroupDatabase:
@@ -223,6 +242,104 @@ Resources:
       EnablePerformanceInsights: false
       PubliclyAccessible: false
 
+  ELBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: ELB Security Group
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+
+  WebServerLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Scheme: internet-facing
+      Subnets:
+        - !Ref PublicSubNet
+        - !Ref PublicSubNet2
+      SecurityGroups:
+        - !GetAtt ELBSecurityGroup.GroupId
+      Tags:
+        - Key: "BatchID"
+          Value: "DevOps"
+
+
+
+  WebServerLoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref WebServerTargetGroup
+      LoadBalancerArn: !Ref WebServerLoadBalancer
+      Port: 80
+      Protocol: HTTP
+      Tags:
+        - Key: "BatchID"
+          Value: "DevOps"
+
+
+  WebServerTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckIntervalSeconds: 120
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 15
+      HealthyThresholdCount: 5
+      Matcher:
+        HttpCode: '200'
+      Name: WebServerTargetGroup
+      Port: 80
+      Protocol: HTTP
+      TargetGroupAttributes:
+      - Key: deregistration_delay.timeout_seconds
+        Value: '20'
+      VpcId: !Ref VPC
+      Tags:
+        - Key: "BatchID"
+          Value: "DevOps"
+
+
+
+  VoteAppLaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateData:
+        # Amazon Linux, taken from the AWS dashboard ui when creating an ec2 instance
+        ImageId: ami-0df8c184d5f6ae949
+        InstanceType: !Ref InstanceType
+        #KeyName: !Ref KeyName # for if you want an ssh key connection
+        SecurityGroupIds: 
+          - !Ref WebServerSecurityGroup
+        UserData:
+          Fn::Base64: !Sub |
+            #!/bin/bash
+            yum update -y
+            yum install -y docker
+            systemctl start docker
+            usermod -a -G docker ec2-user
+            sudo -u ec2-user docker run -p 80:8000 -d crccheck/hello-world
+
+  WebServerAutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      LaunchTemplate:
+        LaunchTemplateId: !Ref VoteAppLaunchTemplate
+        Version: !GetAtt VoteAppLaunchTemplate.LatestVersionNumber
+      MaxSize: '2'
+      MinSize: '0'
+      TargetGroupARNs:
+        - !Ref WebServerTargetGroup
+      VPCZoneIdentifier:
+        - !Ref PublicSubNet
+        - !Ref PublicSubNet2
+      Tags:
+        - Key: "BatchID"
+          Value: "DevOps"
+          PropagateAtLaunch: True
 
 
 Outputs:
