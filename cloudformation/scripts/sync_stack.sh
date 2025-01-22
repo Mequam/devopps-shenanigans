@@ -35,11 +35,11 @@ wait_status() {
    check_status
    echo "[*] $STATUS ..."
    while echo $STATUS | grep $1 >/dev/null; do
-      echo -e "\\e[1A\\e[[*] $STATUS .  "
+      echo -e "\\e[1A\\e[\\[*] $STATUS .  "
       sleep 1
-      echo -e "\\e[1A\\e[[*] $STATUS .. "
+      echo -e "\\e[1A\\e[\\[*] $STATUS .. "
       sleep 1
-      echo -e "\\e[1A\\e[[*] $STATUS ..."
+      echo -e "\\e[1A\\e[\\[*] $STATUS ..."
       sleep 1
       check_status
    done
@@ -48,32 +48,42 @@ wait_status() {
    echo "[*] current state $STATUS"
 }
 
+full_create() {
+   #ensure the stack is deleted so we can re-create it
+   echo $STATUS | grep DELETE_COMPLETE > /dev/null || delete_stack
+   sleep 1
+   wait_status DELETE_IN_PROGRESS
+
+
+   #create the stack
+   create_stack
+
+   #wait while we are creating the stack
+   wait_status CREATE_IN_PROGRESS
+
+   #check the status on the end of create
+   if echo $STATUS | grep ROLLBACK > /dev/null
+   then
+      echo "[*] stack is in rollback state $STATUS"
+   elif echo $STATUS | grep COMPLETE > /dev/null
+   then
+      echo "[*] stack is completed!"
+   fi
+
+   echo "[*] exiting with stack status of $STATUS"
+}
+
 #delete command
 if [[ $1 == "delete" ]]
 then
    delete_stack
    wait_status DELETE_IN_PROGRESS
-   return 0
-fi
-#ensure the stack is deleted so we can re-create it
-echo $STATUS | grep DELETE_COMPLETE > /dev/null || delete_stack
-sleep 1
-wait_status DELETE_IN_PROGRESS
-
-
-#create the stack
-create_stack
-
-#wait while we are creating the stack
-wait_status CREATE_IN_PROGRESS
-
-#check the status on the end of create
-if echo $STATUS | grep ROLLBACK > /dev/null
+   exit 0
+elif [[ $1 == "watch" ]]
 then
-   echo "[*] stack is in rollback state $STATUS"
-elif echo $STATUS | grep COMPLETE > /dev/null
-then
-   echo "[*] stack is completed!"
+   wait_status $2
+   exit 0
 fi
 
-echo "[*] exiting with stack status of $STATUS"
+full_create
+exit 0

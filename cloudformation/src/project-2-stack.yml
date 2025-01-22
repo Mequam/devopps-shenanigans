@@ -116,7 +116,7 @@ Resources:
     Properties:
       CidrBlock: !Ref VPCCidr
       EnableDnsHostnames: false
-      EnableDnsSupport: false
+      EnableDnsSupport: true
       Tags:
         - Key: "BatchID"
           Value: "DevOps"
@@ -177,6 +177,35 @@ Resources:
       Tags:
         - Key: "BatchID"
           Value: "DevOps"
+  
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      Tags:
+        - Key: "BatchID"
+          Value: "DevOps"
+      VpcId: !Ref VPC
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PublicSubnet1RouteAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubNet
+      RouteTableId: !Ref PublicRouteTable
+
+
+  PublicSubnet2RouteAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubNet2
+      RouteTableId: !Ref PublicRouteTable
+
   DBSubnetGroup: 
     Type: AWS::RDS::DBSubnetGroup
     Properties: 
@@ -197,50 +226,63 @@ Resources:
       - IpProtocol: tcp
         FromPort: 80
         ToPort: 80
-
-  #let any host from the given subnet talk to us
-  SecurityGroupDatabase:
-    Type: 'AWS::EC2::SecurityGroup'
-    Properties:
-      GroupDescription: 'vote-app-aurora-database-sg'
-      GroupName: 'vote-app-aurora-database-sg'
-      VpcId: !Ref VPC
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          CidrIp: !Ref PublicSubnetCidr
-          FromPort: !Ref DBPort
-          ToPort: !Ref DBPort
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
       SecurityGroupEgress:
-        - IpProtocol: '-1'
-          CidrIp: '0.0.0.0/0'
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
+  #let any host from the given subnet talk to us
+  #SecurityGroupDatabase:
+  #  Type: 'AWS::EC2::SecurityGroup'
+  #  Properties:
+  #    GroupDescription: 'vote-app-aurora-database-sg'
+  #    GroupName: 'vote-app-aurora-database-sg'
+  #    VpcId: !Ref VPC
+  #    SecurityGroupIngress:
+  #      - IpProtocol: tcp
+  #        CidrIp: !Ref PublicSubnetCidr
+  #        FromPort: !Ref DBPort
+  #        ToPort: !Ref DBPort
+  #    SecurityGroupEgress:
+  #      - IpProtocol: '-1'
+  #        CidrIp: '0.0.0.0/0'
 
-  AuroraDBCluster:
-    Type: 'AWS::RDS::DBCluster'
-    Properties:
-      DBClusterIdentifier: 'vote-app-postgres-db'
-      DatabaseName: 'vote'
-      DBSubnetGroupName: !Ref DBSubnetGroup
-      #DBClusterParameterGroupName: !Ref AuroraPostgresParameterGroup
-      DeletionProtection: false
-      Engine: 'aurora-postgresql'
-      EngineMode: 'provisioned'
-      EngineVersion: "16.6"
-      MasterUsername: !Ref DBUsername
-      MasterUserPassword: !Ref DBPassword
-      Port: !Ref DBPort
-      StorageEncrypted: false
-      VpcSecurityGroupIds:
-        - !Ref SecurityGroupDatabase
+  #AuroraDBCluster:
+  #  Type: 'AWS::RDS::DBCluster'
+  #  Properties:
+  #    DBClusterIdentifier: 'vote-app-postgres-db'
+  #    DatabaseName: 'vote'
+  #    DBSubnetGroupName: !Ref DBSubnetGroup
+  #    #DBClusterParameterGroupName: !Ref AuroraPostgresParameterGroup
+  #    DeletionProtection: false
+  #    Engine: 'aurora-postgresql'
+  #    EngineMode: 'provisioned'
+  #    EngineVersion: "16.6"
+  #    MasterUsername: !Ref DBUsername
+  #    MasterUserPassword: !Ref DBPassword
+  #    Port: !Ref DBPort
+  #    StorageEncrypted: false
+  #    VpcSecurityGroupIds:
+  #      - !Ref SecurityGroupDatabase
 
-  WriterInstance:
-    Type: 'AWS::RDS::DBInstance'
-    Properties:
-      Engine: 'aurora-postgresql'
-      DBClusterIdentifier: !Ref AuroraDBCluster
-      DBInstanceClass: 'db.r5.large'
-      AllowMajorVersionUpgrade: false
-      EnablePerformanceInsights: false
-      PubliclyAccessible: false
+  #  WriterInstance:
+  #    Type: 'AWS::RDS::DBInstance'
+  #    Properties:
+  #      Engine: 'aurora-postgresql'
+  #      DBClusterIdentifier: !Ref AuroraDBCluster
+  #      DBInstanceClass: 'db.r5.large'
+  #      AllowMajorVersionUpgrade: false
+  #      EnablePerformanceInsights: false
+  #      PubliclyAccessible: false
 
   ELBSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -252,6 +294,20 @@ Resources:
         FromPort: 80
         ToPort: 80
         CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
+
 
   WebServerLoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
@@ -311,7 +367,7 @@ Resources:
         # Amazon Linux, taken from the AWS dashboard ui when creating an ec2 instance
         ImageId: ami-09115b7bffbe3c5e4
         InstanceType: !Ref InstanceType
-        #KeyName: !Ref KeyName # for if you want an ssh key connection
+        KeyName: dak-test-key
         SecurityGroupIds: 
           - !Ref WebServerSecurityGroup
         UserData:
@@ -336,7 +392,7 @@ Resources:
         LaunchTemplateId: !Ref VoteAppLaunchTemplate
         Version: !GetAtt VoteAppLaunchTemplate.LatestVersionNumber
       MaxSize: '2'
-      MinSize: '0'
+      MinSize: '1'
       TargetGroupARNs:
         - !Ref WebServerTargetGroup
       VPCZoneIdentifier:
