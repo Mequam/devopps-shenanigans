@@ -33,9 +33,14 @@ check_status() {
 wait_status() {
 
    check_status
+   echo "[*] $STATUS ..."
    while echo $STATUS | grep $1 >/dev/null; do
-      echo "[*] $STATUS contains $1"
-      sleep 3
+      echo -e "\\e[1A\\e[[*] $STATUS .  "
+      sleep 1
+      echo -e "\\e[1A\\e[[*] $STATUS .. "
+      sleep 1
+      echo -e "\\e[1A\\e[[*] $STATUS ..."
+      sleep 1
       check_status
    done
 
@@ -43,8 +48,15 @@ wait_status() {
    echo "[*] current state $STATUS"
 }
 
+#delete command
+if [[ $1 == "delete" ]]
+then
+   delete_stack
+   wait_status DELETE_IN_PROGRESS
+   return 0
+fi
 #ensure the stack is deleted so we can re-create it
-echo $STATUS | grep DELETE > /dev/null || delete_stack
+echo $STATUS | grep DELETE_COMPLETE > /dev/null || delete_stack
 sleep 1
 wait_status DELETE_IN_PROGRESS
 
@@ -53,7 +65,7 @@ wait_status DELETE_IN_PROGRESS
 create_stack
 
 #wait while we are creating the stack
-wait_status CREATE
+wait_status CREATE_IN_PROGRESS
 
 #check the status on the end of create
 if echo $STATUS | grep ROLLBACK > /dev/null

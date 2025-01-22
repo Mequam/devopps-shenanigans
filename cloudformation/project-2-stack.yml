@@ -309,7 +309,7 @@ Resources:
     Properties:
       LaunchTemplateData:
         # Amazon Linux, taken from the AWS dashboard ui when creating an ec2 instance
-        ImageId: ami-0df8c184d5f6ae949
+        ImageId: ami-09115b7bffbe3c5e4
         InstanceType: !Ref InstanceType
         #KeyName: !Ref KeyName # for if you want an ssh key connection
         SecurityGroupIds: 
@@ -322,6 +322,12 @@ Resources:
             systemctl start docker
             usermod -a -G docker ec2-user
             sudo -u ec2-user docker run -p 80:8000 -d crccheck/hello-world
+        TagSpecifications:
+          - ResourceType: "instance"
+            Tags:
+              - Key: "BatchID"
+                Value: "DevOps"
+
 
   WebServerAutoScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
