@@ -223,22 +223,56 @@ Resources:
       GroupDescription: Security Group For Web Servers
       VpcId: !Ref VPC
       SecurityGroupIngress:
+      
+      #http protocol
       - IpProtocol: tcp
         FromPort: 80
         ToPort: 80
         CidrIp: 0.0.0.0/0
+      
+      #ssh protocol
       - IpProtocol: tcp
         FromPort: 22
         ToPort: 22
+        CidrIp: 0.0.0.0/0
+      
+      #DNS protocols
+      - IpProtocol: tcp
+        FromPort: 53
+        ToPort: 53
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: udp
+        FromPort: 53
+        ToPort: 53
         CidrIp: 0.0.0.0/0
       SecurityGroupEgress:
+        #http protocol
       - IpProtocol: tcp
         FromPort: 80
         ToPort: 80
         CidrIp: 0.0.0.0/0
+        #dns protocol
       - IpProtocol: tcp
         FromPort: 22
         ToPort: 22
+        CidrIp: 0.0.0.0/0
+        
+        #dns protocol
+      - IpProtocol: tcp
+        FromPort: 53
+        ToPort: 53
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: udp
+        FromPort: 53
+        ToPort: 53
+        CidrIp: 0.0.0.0/0
+      
+      # yum needs this to download and startup
+      # TODO: we could probably limit this to specific server
+      # ip's if we new the webservers that yum uses
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
         CidrIp: 0.0.0.0/0
   #let any host from the given subnet talk to us
   #SecurityGroupDatabase:
