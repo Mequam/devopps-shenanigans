@@ -15,9 +15,11 @@ aws cloudformation create-stack \
                  ParameterKey=AvailabilityZone1,ParameterValue=us-east-1a \
                  ParameterKey=AvailabilityZone2,ParameterValue=us-east-1b \
                  ParameterKey=InstanceType,ParameterValue=t3.micro \
-                 ParameterKey=DBUsername,ParameterValue=vote \
-                 ParameterKey=DBPassword,ParameterValue=votevote23blah \
-                 ParameterKey=DBPort,ParameterValue=5433
+                 ParameterKey=DBUsername,ParameterValue=$DATABASE_USERNAME \
+                 ParameterKey=DBPassword,ParameterValue=$DATABASE_PASSWORD \
+                 ParameterKey=DBPort,ParameterValue=$DATABASE_PORT \
+                 ParameterKey=DBName,ParameterValue=$DATABASE_NAME \
+                 ParameterKey=ServerAllowedHosts,ParameterValue=$ALLOWED_HOST
 }
 
 delete_stack() {
