@@ -1,6 +1,7 @@
 
 <div *ngIf="quiz">
   <h2>{{ quiz.name }}</h2>
+  <h3>{{ quiz.description }}</h3>
 
   <div class="quiz-options-container" *ngFor="let option of quiz.options">
     <label for="rdo-{{ option }}">{{ option }}</label>

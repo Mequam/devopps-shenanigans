@@ -1,1 +1,7 @@
-<p>quiz-list works!</p>
+<div *ngIf="quiz_fingerprints">
+  <ul>
+    <li *ngFor="let fingerprint of quiz_fingerprints">
+      <a href="get/{{ fingerprint.id }}">{{ fingerprint.quiz_name }}</a>
+    </li>
+  </ul>
+</div>

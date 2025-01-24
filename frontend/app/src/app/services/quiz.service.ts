@@ -23,7 +23,7 @@ export class QuizService {
   }
 
   list_quizes() : Observable<[QuizFingerprint]> {
-    return this.http.get<[Quiz]>(
+    return this.http.get<[QuizFingerprint]>(
       `http://${environment.api_addr}/${this.GET_URL}/all`
     );
   }
