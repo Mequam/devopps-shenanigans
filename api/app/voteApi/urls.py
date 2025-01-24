@@ -19,7 +19,7 @@ from django.urls import path
 from vote_api.views import get_quiz,vote
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+        #path('admin/', admin.site.urls), uncomment for default admin :D
     path('quiz/<quiz_id>',get_quiz),
     path('vote',vote)
 
