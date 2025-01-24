@@ -260,6 +260,12 @@ Resources:
         FromPort: 53
         ToPort: 53
         CidrIp: 0.0.0.0/0
+      
+      # database port
+      - IpProtocol: tcp
+        FromPort: !Ref DBPort
+        ToPort: !Ref DBPort
+        CidrIp: 0.0.0.0/0
       SecurityGroupEgress:
         #http protocol
       - IpProtocol: tcp
@@ -280,6 +286,13 @@ Resources:
       - IpProtocol: udp
         FromPort: 53
         ToPort: 53
+        CidrIp: 0.0.0.0/0
+
+
+      # database port
+      - IpProtocol: tcp
+        FromPort: !Ref DBPort
+        ToPort: !Ref DBPort
         CidrIp: 0.0.0.0/0
       
       # yum needs this to download and startup
@@ -322,7 +335,7 @@ Resources:
     Type: 'AWS::RDS::DBCluster'
     Properties:
       DBClusterIdentifier: 'vote-app-postgres-db'
-      DatabaseName: 'vote'
+      DatabaseName: !Ref DBName
       DBSubnetGroupName: !Ref DBSubnetGroup
       #DBClusterParameterGroupName: !Ref AuroraPostgresParameterGroup
       DeletionProtection: false
@@ -465,6 +478,7 @@ Resources:
 
   WebServerAutoScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
+    DependsOn: WriterInstance
     Properties:
       LaunchTemplate:
         LaunchTemplateId: !Ref VoteAppLaunchTemplate
