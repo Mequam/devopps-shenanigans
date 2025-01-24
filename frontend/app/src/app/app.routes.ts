@@ -3,7 +3,7 @@ import {QuizComponent} from './components/quiz/quiz.component';
 
 export const routes: Routes = [
   {
-    path: 'get',
+    path: 'get/:quiz_id',
     component: QuizComponent
   }
 ];
