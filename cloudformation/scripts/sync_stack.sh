@@ -19,11 +19,11 @@ aws cloudformation create-stack \
                  ParameterKey=DBPassword,ParameterValue=$DATABASE_PASSWORD \
                  ParameterKey=DBPort,ParameterValue=$DATABASE_PORT \
                  ParameterKey=DBName,ParameterValue=$DATABASE_NAME \
-                 ParameterKey=ServerAllowedHosts,ParameterValue=$ALLOWED_HOST
+                 ParameterKey=ServerAllowedHosts,ParameterValue=$ALLOWED_HOST || exit 1
 }
 
 delete_stack() {
-   aws cloudformation delete-stack --stack-name $STACK_NAME
+   aws cloudformation delete-stack --stack-name $STACK_NAME || exit 1
 }
 
 #queries aws to get the status of the stack
