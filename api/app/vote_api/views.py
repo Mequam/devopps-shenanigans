@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse,Http404
 from django.views.decorators.csrf import csrf_exempt
 from .models import Quiz
+from .models import Option
 import json
 
 # Create your views here.
@@ -32,7 +33,6 @@ def vote(request)->HttpResponse:
             option = data.get("option")
 
 
-        print(quiz_id)
         q = None
         try:
             q = Quiz.objects.get(id=quiz_id)
@@ -55,3 +55,35 @@ def get_winning_option(request,vote_id)->HttpResponse:
         return resp
 
     return HttpResponse({ "winner" : q.get_winner(self) })
+
+@csrf_exempt
+def create_quiz(request)->HttpResponse:
+
+    if request.META.get("CONTENT_TYPE") != 'application/json':
+        ret_val = HttpResponse("content type must be json")
+        ret_val.status_code = 500
+        return ret_val
+    
+    data = json.loads(request.body)
+
+    q1 = Quiz(description=data["quiz_description"],name=data["quiz_name"])
+    q1.save()
+
+    options = [Option(description=option,amount=0,quiz=q1) 
+                for option in data["options"]]
+
+    for option in options:
+        option.save()
+
+
+
+    return HttpResponse(json.dumps({"quiz_id": q1.id}))
+
+@csrf_exempt
+def list_quizes(request)->HttpResponse:
+    """give a quick overview of all quizes in the system"""
+    return HttpResponse(
+            json.dumps(
+                [ {"quiz_name":quiz.name,"id":quiz.id} for quiz in Quiz.objects.all()]
+                )
+            )

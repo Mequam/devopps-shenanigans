@@ -1,0 +1,8 @@
+{
+   "quiz_description":"a test of the internets favorite animals",
+   "quiz_name":"cats or dogs?",
+   "options":[
+      "cats!",
+      "dogs!"
+   ]
+}
