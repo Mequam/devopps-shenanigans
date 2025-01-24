@@ -32,6 +32,7 @@ class Quiz(models.Model):
         converts this quiz to a dictionary ready to beam over the interwebs :D
         """
         return json.dumps({
+                            "id": self.id if self.id else -1,
                             "name": self.name,
                             "description": self.description,
                             "options": [vote[0] for vote in self.get_votes()],
