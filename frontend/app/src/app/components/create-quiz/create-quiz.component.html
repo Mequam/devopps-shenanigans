@@ -1,0 +1,11 @@
+<div class="quiz-create">
+  <input type="text" [formControl]="txtQuizName"/>
+  <input type="text" [formControl]="txtQuizDescription"/>
+  <ul *ngIf="txtQuizOption" class="option-list">
+    <li *ngFor="control of txtQuizOption; let i = index">
+      <input name="option-{{i}}" type="text" [formControl]="txtQuizOption[i]"/>
+      <button (click)="removeQuizOption(i)">X</button>
+    </li>
+  </ul>
+  <button (click)="createNewOption()">+</button>
+</div>

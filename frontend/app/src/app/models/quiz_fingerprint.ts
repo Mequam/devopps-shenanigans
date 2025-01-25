@@ -4,5 +4,5 @@
  * */
 export class QuizFingerprint {
   public readonly id : number = 0;
-  public readonly quiz_name : string = "";
+  public readonly name : string = "";
 }

@@ -66,7 +66,7 @@ def create_quiz(request)->HttpResponse:
     
     data = json.loads(request.body)
 
-    q1 = Quiz(description=data["quiz_description"],name=data["quiz_name"])
+    q1 = Quiz(description=data["description"],name=data["name"])
     q1.save()
 
     options = [Option(description=option,amount=0,quiz=q1) 
@@ -84,6 +84,6 @@ def list_quizes(request)->HttpResponse:
     """give a quick overview of all quizes in the system"""
     return HttpResponse(
             json.dumps(
-                [ {"quiz_name":quiz.name,"id":quiz.id} for quiz in Quiz.objects.all()]
+                [ {"name":quiz.name,"id":quiz.id} for quiz in Quiz.objects.all()]
                 )
             )
