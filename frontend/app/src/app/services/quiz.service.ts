@@ -4,6 +4,7 @@ import { Quiz } from "../models/quiz";
 import { Observable } from "rxjs";
 import { environment } from "../../environments/environment.development";
 import { QuizFingerprint } from "../models/quiz_fingerprint";
+import {QuizCreateDto} from "../models/quiz-create.dto";
 
 @Injectable({ providedIn: 'root'})
 export class QuizService {
@@ -36,5 +37,10 @@ export class QuizService {
             option:option
           }
     )
+  }
+
+  create_quiz(create_quiz_dto : QuizCreateDto) {
+    return this.http.post(`http://${environment.api_addr}/${this.GET_URL}/create`, create_quiz_dto);
+
   }
 }
