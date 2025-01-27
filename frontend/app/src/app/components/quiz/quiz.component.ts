@@ -3,6 +3,7 @@ import {QuizService} from '../../services/quiz.service';
 import {Quiz} from '../../models/quiz';
 import {NgFor, NgIf} from '@angular/common';
 import {FormControl, NgModel, ReactiveFormsModule} from '@angular/forms';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-quiz',
@@ -11,7 +12,7 @@ import {FormControl, NgModel, ReactiveFormsModule} from '@angular/forms';
   styleUrl: './quiz.component.css'
 })
 export class QuizComponent {
-  constructor(private quiz_service : QuizService) {}
+  constructor(private quiz_service : QuizService, private router : Router) {}
 
   @Input() quiz : Quiz | null = null;
   @Input() quiz_id : number | null = null;
@@ -34,8 +35,14 @@ export class QuizComponent {
   }
 
   onVoteBtn() : void {
-    this.quiz_service.vote_quiz(2, this.vote_selection.value).subscribe(data=>{
+    if (!this.quiz) return;
 
-    });
+    this.quiz_service.vote_quiz(this.quiz.id,
+                                this.vote_selection.value).subscribe(
+                                data=>{
+
+                                });
+  this.router.navigate(["/"]);
+
   }
 }

@@ -68,3 +68,14 @@ a:before {
   border-left: 10px solid black;
 }
 */
+
+header a.header {
+  float: none;
+  color: black;
+  background-color: transparent;
+  border: 0;
+  font-size: 300%;
+  font-weight: 900;
+  position: relative;
+  top: -0.3em;
+}

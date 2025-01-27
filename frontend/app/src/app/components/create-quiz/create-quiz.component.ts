@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {QuizCreateDto} from '../../models/quiz-create.dto';
 import {QuizService} from '../../services/quiz.service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-create-quiz',
@@ -15,7 +16,7 @@ export class CreateQuizComponent {
   txtQuizDescription : FormControl = new FormControl('');
   txtQuizOption : [FormControl]  | null = null;
 
-  constructor (private quiz_service : QuizService) {}
+  constructor (private quiz_service : QuizService,private router : Router ) {}
 
 
   /*
@@ -49,6 +50,8 @@ export class CreateQuizComponent {
     let q = new QuizCreateDto(this.txtQuizDescription.value,
                               this.txtQuizName.value,
                               this.txtQuizOption.map(value=>value.value) as [string]);
+
     this.quiz_service.create_quiz(q).subscribe();
+    this.router.navigate(["/"]);
   }
 }

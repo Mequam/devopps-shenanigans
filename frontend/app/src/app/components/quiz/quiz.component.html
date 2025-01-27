@@ -2,10 +2,12 @@
 <div *ngIf="quiz">
   <h2>{{ quiz.name }}</h2>
   <h3>{{ quiz.description }}</h3>
-
-  <div class="quiz-options-container" *ngFor="let option of quiz.options">
-    <input id="rdo-{{ option }}" type="radio" [value]="option" [formControl]="vote_selection" />
-    <label for="rdo-{{ option }}">{{ option }}</label>
+  <p class="winner">Current Winner : <b>{{ quiz.winner }}</b> </p>
+  <div class="quiz-options-container">
+    <div *ngFor="let option of quiz.options">
+      <input id="rdo-{{ option }}" type="radio" [value]="option" [formControl]="vote_selection" />
+      <label for="rdo-{{ option }}">{{ option }}</label>
+    </div>
   </div>
 
   <div *ngIf="vote_display" class="submit-container">
