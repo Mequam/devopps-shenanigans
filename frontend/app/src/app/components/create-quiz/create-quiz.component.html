@@ -1,13 +1,24 @@
 <div class="quiz-create">
-  <input type="text" [formControl]="txtQuizName"/>
-  <input type="text" [formControl]="txtQuizDescription"/>
-  <ul *ngIf="txtQuizOption" class="option-list">
-    <li *ngFor="control of txtQuizOption; let i = index">
-      <input name="option-{{i}}" type="text" [formControl]="txtQuizOption[i]"/>
-      <button (click)="removeQuizOption(i)">X</button>
-    </li>
-  </ul>
-  <button (click)="createNewOption()">+</button>
+  <h2>Create Your Quiz Here</h2>
+  <div class="input-container">
 
-  <button (click)="createQuiz()">create</button>
+  <label for="txtQuizName">name:</label>
+  <input type="text" name="txtQuizName" [formControl]="txtQuizName"/>
+
+  <label for="txtQuizDescription">description:</label>
+  <input type="text" name="txtQuizDescription" [formControl]="txtQuizDescription"/>
+
+  <div class="option-container">
+    <h3>quiz options</h3>
+    <ol *ngIf="txtQuizOption" class="option-list">
+      <li *ngFor="control of txtQuizOption; let i = index">
+        <input name="option-{{i}}" type="text" [formControl]="txtQuizOption[i]"/>
+        <button (click)="removeQuizOption(i)">X</button>
+      </li>
+    </ol>
+  </div>
+  <button class="btn-add-option" (click)="createNewOption()">add new option</button>
+  </div>
+
+  <button class="btn-create" (click)="createQuiz()">create</button>
 </div>

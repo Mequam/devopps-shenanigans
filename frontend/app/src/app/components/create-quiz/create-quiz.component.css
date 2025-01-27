@@ -1,0 +1,43 @@
+button {
+  margin-top: 10px;
+}
+.input-container {
+  border-bottom: 1px solid black;
+  width: 80%;
+  padding: 10px;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  row-gap: 10px;
+}
+.option-list {
+  /*grid-column-start: span 2;*/
+  text-align: right;
+  width: 60%;
+  margin-left: auto;
+}
+.option-container {
+  text-align: right;
+  grid-column-start: span 2;
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+  padding-bottom: 10px;
+}
+.option-container h1 {
+  width: 60%;
+  margin-left: auto;
+}
+
+.btn-create {
+  margin-top: 20px;
+}
+.btn-add-option {
+  grid-column-start: 2;
+}
+ol {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+li input {
+  margin-right: 10px;
+}
