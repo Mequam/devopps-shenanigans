@@ -19,11 +19,22 @@ export class QuizListComponent {
   constructor (private quiz_service : QuizService) {}
 
   @Input() quiz_fingerprints : [QuizFingerprint] | null = null;
+  public max_string_length : number = 45
+
+  getLimitedName(name : string) : string {
+    if (!name) return "unamed quiz";
+    if (name.length > this.max_string_length) {
+      return name.slice(0,this.max_string_length) + "...";
+    }
+    return name;
+  }
 
   ngOnInit(): void {
     if (!this.quiz_fingerprints)
       this.quiz_service.list_quizes().subscribe(value=>{
         this.quiz_fingerprints = value;
+        this.quiz_fingerprints.forEach(v=>{
+        })
       });
   }
 }

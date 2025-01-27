@@ -1,7 +1,7 @@
 <div *ngIf="quiz_fingerprints">
   <ul>
     <li *ngFor="let fingerprint of quiz_fingerprints">
-      <a href="get/{{ fingerprint.id }}">{{ fingerprint.name }}</a>
+      <a href="get/{{ fingerprint.id }}">{{ getLimitedName(fingerprint.name)}}</a>
     </li>
   </ul>
 </div>

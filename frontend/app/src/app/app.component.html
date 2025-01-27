@@ -1,6 +1,15 @@
 <body>
-<h1>hello from the main template</h1>
-<router-outlet />
-<app-quiz-list />
-<app-create-quiz />
+  <header>
+    <h1>voting app</h1>
+    <a href="/new">new quiz</a>
+  </header>
+
+<div class="flex-container">
+  <div class="main-content">
+    <router-outlet />
+  </div>
+  <div class="sidebar-content">
+    <app-quiz-list />
+  </div>
+</div>
 </body>
