@@ -4,10 +4,12 @@
   <h3>{{ quiz.description }}</h3>
 
   <div class="quiz-options-container" *ngFor="let option of quiz.options">
-    <label for="rdo-{{ option }}">{{ option }}</label>
     <input id="rdo-{{ option }}" type="radio" [value]="option" [formControl]="vote_selection" />
+    <label for="rdo-{{ option }}">{{ option }}</label>
   </div>
-  <p>{{ vote_display }}</p>
 
+  <div *ngIf="vote_display" class="submit-container">
+  <p>vote for {{ vote_display }}?</p>
   <button type="button" (click)="onVoteBtn()">vote</button>
+  </div>
 </div>
